@@ -27,9 +27,15 @@ async function run() {
 
     app.post("/addtoys", async (req, res) => {
       const body = req.body;
+      body.createdAt = new Date();
       const result = await alltoys.insertOne(body);
       res.send(result);
       console.log(body);
+    });
+
+    app.get("/alltoys", async (req, res) => {
+      const result = await alltoys.find().toArray();
+      res.send(result);
     });
 
     await client.db("admin").command({ ping: 1 });
