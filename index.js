@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const port = process.env.PORT || 5000;
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 
 app.use(cors());
@@ -38,9 +38,37 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/singletoys/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await alltoys.findOne(query);
+      res.send(result);
+      console.log(result);
+    });
+
     app.get("/mytoys/:email", async (req, res) => {
-      console.log(req.params.email);
       const result = await alltoys.find({ email: req.params.email }).toArray();
+      res.send(result);
+    });
+
+    app.put("/mytoys/:id", async (req, res) => {
+      const id = req.params.id;
+      const body = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          price: body.price,
+          quantity: body.quantity,
+          description: body.description,
+        },
+      };
+      const result = await alltoys.updateOne(filter, updateDoc);
+    });
+
+    app.delete("/mytoys/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await alltoys.deleteOne(query);
       res.send(result);
     });
 
