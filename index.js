@@ -25,6 +25,7 @@ async function run() {
 
     const alltoys = client.db("toyStore").collection("allToys");
 
+    // PUT DATA ON SERVER OPERATION
     app.post("/addtoys", async (req, res) => {
       const body = req.body;
       body.createdAt = new Date();
@@ -33,27 +34,31 @@ async function run() {
       console.log(body);
     });
 
+    // GET ALL DATA OPERATION
     app.get("/alltoys", async (req, res) => {
       const result = await alltoys.find().toArray();
       res.send(result);
     });
 
+    // GET DATA FOR SINGLE TOYS BY ID
     app.get("/singletoys/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await alltoys.findOne(query);
       res.send(result);
-      console.log(result);
     });
 
+    // GET DATA BY EMAIL OPERATION
     app.get("/mytoys/:email", async (req, res) => {
       const result = await alltoys.find({ email: req.params.email }).toArray();
       res.send(result);
     });
 
+    // UPDATE OPERATION
     app.put("/mytoys/:id", async (req, res) => {
       const id = req.params.id;
       const body = req.body;
+      const options = { upsert: true };
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
         $set: {
@@ -62,9 +67,11 @@ async function run() {
           description: body.description,
         },
       };
-      const result = await alltoys.updateOne(filter, updateDoc);
+      const result = await alltoys.updateOne(filter, updateDoc, options);
+      res.send(result);
     });
 
+    // DELETE OPERATION
     app.delete("/mytoys/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
