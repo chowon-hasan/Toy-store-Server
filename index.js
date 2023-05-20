@@ -25,6 +25,23 @@ async function run() {
 
     const alltoys = client.db("toyStore").collection("allToys");
 
+    const indexKeys = { toyName: 1, category: 1 };
+    const indexOptions = { name: "titlecategory" };
+    const result = await alltoys.createIndex(indexKeys, indexOptions);
+
+    app.get("/toysearch/:text", async (req, res) => {
+      const searchText = req.params.text;
+      const result = await alltoys
+        .find({
+          $or: [
+            { toyName: { $regex: searchText, $options: "i" } },
+            { category: { $regex: searchText, $options: "i" } },
+          ],
+        })
+        .toArray();
+      res.send(result);
+    });
+
     // PUT DATA ON SERVER OPERATION
     app.post("/addtoys", async (req, res) => {
       const body = req.body;
@@ -36,7 +53,7 @@ async function run() {
 
     // GET ALL DATA OPERATION
     app.get("/alltoys", async (req, res) => {
-      const result = await alltoys.find().toArray();
+      const result = await alltoys.find().sort({ createdAt: -1 }).toArray();
       res.send(result);
     });
 
