@@ -53,7 +53,10 @@ async function run() {
 
     // GET ALL DATA OPERATION
     app.get("/alltoys", async (req, res) => {
-      const result = await alltoys.find().sort({ createdAt: -1 }).toArray();
+      const result = await alltoys
+        .find()
+        .sort({ price: 1, createdAt: -1 })
+        .toArray();
       res.send(result);
     });
 
@@ -67,7 +70,10 @@ async function run() {
 
     // GET DATA BY EMAIL OPERATION
     app.get("/mytoys/:email", async (req, res) => {
-      const result = await alltoys.find({ email: req.params.email }).toArray();
+      const result = await alltoys
+        .find({ email: req.params.email })
+        .sort({ createdAt: -1 })
+        .toArray();
       res.send(result);
     });
 
