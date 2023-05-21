@@ -21,14 +21,25 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    await client.connect();
+    // client.connect();
 
     const alltoys = client.db("toyStore").collection("allToys");
 
-    const indexKeys = { toyName: 1, category: 1 };
-    const indexOptions = { name: "titlecategory" };
-    const result = await alltoys.createIndex(indexKeys, indexOptions);
+    // const indexKeys = { toyName: 1, category: 1 };
+    // const indexOptions = { name: "titlecategory" };
+    // const result = await alltoys.createIndex(indexKeys, indexOptions);
 
+    // GET ALL DATA OPERATION
+    app.get("/alltoys", async (req, res) => {
+      const result = await alltoys
+        .find()
+        .sort({ price: 1, createdAt: -1 })
+        .limit(20)
+        .toArray();
+      res.send(result);
+    });
+
+    // SEARCH OPERATION
     app.get("/toysearch/:text", async (req, res) => {
       const searchText = req.params.text;
       const result = await alltoys
@@ -49,15 +60,6 @@ async function run() {
       const result = await alltoys.insertOne(body);
       res.send(result);
       console.log(body);
-    });
-
-    // GET ALL DATA OPERATION
-    app.get("/alltoys", async (req, res) => {
-      const result = await alltoys
-        .find()
-        .sort({ price: 1, createdAt: -1 })
-        .toArray();
-      res.send(result);
     });
 
     // GET DATA FOR SINGLE TOYS BY ID
@@ -108,7 +110,7 @@ async function run() {
     );
   } finally {
     // Ensures that the client will close when you finish/error
-    // await client.close();
+    // client.close();
   }
 }
 run().catch(console.dir);
